@@ -1,0 +1,43 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+out/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.*
+
+# Editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jest
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Advent of Code inputs
+inputs/
+inputs/*.txt
+
+# Misc
+*.swp
+*.swo

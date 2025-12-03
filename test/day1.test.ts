@@ -1,6 +1,6 @@
 import { part1, part2 } from "../src/day1";
 
-import { readInput } from "./utils.test";
+import { readInput } from "./utils";
 
 describe("day 1", () => {
   describe("part 1", () => {

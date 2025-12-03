@@ -1,6 +1,6 @@
 import { solve } from "../src/day2";
 import { isValidIdPart1, isValidIdPart2 } from "../src/day2";
-import { readInput } from "./utils.test";
+import { readInput } from "./utils";
 
 describe("day 2", () => {
   describe("part 1", () => {

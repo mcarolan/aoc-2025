@@ -1,6 +1,6 @@
 import { part1, part2 } from "../src/day1";
 
-import fs from "fs";
+import { readInput } from "./utils.test";
 
 describe("day 1", () => {
   describe("part 1", () => {
@@ -19,7 +19,7 @@ describe("day 1", () => {
     });
 
     test("part1", () => {
-      const input = fs.readFileSync("inputs/day1.txt", "utf-8");
+      const input = readInput("day1");
       expect(part1(input)).toBe(1195);
     });
 
@@ -38,7 +38,7 @@ describe("day 1", () => {
     });
 
     test("part2", () => {
-      const input = fs.readFileSync("inputs/day1.txt", "utf-8");
+      const input = readInput("day1");
       expect(part2(input)).toBe(6770);
     });
   });

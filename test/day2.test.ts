@@ -1,6 +1,6 @@
 import { solve } from "../src/day2";
 import { isValidIdPart1, isValidIdPart2 } from "../src/day2";
-import fs from "fs";
+import { readInput } from "./utils.test";
 
 describe("day 2", () => {
   describe("part 1", () => {
@@ -30,12 +30,12 @@ describe("day 2", () => {
     });
 
     test("input part 1", () => {
-      const input = fs.readFileSync("inputs/day2.txt", "utf-8");
+      const input = readInput("day2");
       expect(solve(input, isValidIdPart1)).toBe(9188031749);
     });
 
     test("input", () => {
-      const input = fs.readFileSync("inputs/day2.txt", "utf-8");
+      const input = readInput("day2");
       expect(solve(input, isValidIdPart2)).toBe(11323661261);
     });
   });

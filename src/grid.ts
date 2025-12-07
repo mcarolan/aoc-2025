@@ -5,38 +5,44 @@ export type Cell<T> =
   | { kind: "occupied"; value: T; position: Position }
   | { kind: "vacant"; position: Position };
 
-export class Position {
-  private rowNumber: RowNumber;
-  private colNumber: ColNumber;
+export type Position = { row: number; col: number };
 
-  constructor(rowNumber: RowNumber, colNumber: ColNumber) {
-    this.rowNumber = rowNumber;
-    this.colNumber = colNumber;
-  }
+export function positionNeighbours(position: Position): Position[] {
+  return [
+    { row: position.row - 1, col: position.col },
+    { row: position.row - 1, col: position.col - 1 },
+    { row: position.row - 1, col: position.col + 1 },
 
-  getRow(): RowNumber {
-    return this.rowNumber;
-  }
+    { row: position.row + 1, col: position.col },
+    { row: position.row + 1, col: position.col + 1 },
+    { row: position.row + 1, col: position.col - 1 },
 
-  getCol(): ColNumber {
-    return this.colNumber;
-  }
+    { row: position.row, col: position.col + 1 },
+    { row: position.row, col: position.col - 1 },
+  ];
+}
 
-  getNeighbours(): Position[] {
-    const result: Position[] = [];
-    for (const rowOffset of [-1, 0, 1]) {
-      for (const colOffset of [-1, 0, 1]) {
-        if (rowOffset == 0 && colOffset == 0) {
-          continue;
-        }
-
-        result.push(
-          new Position(this.rowNumber + rowOffset, this.colNumber + colOffset),
-        );
-      }
-    }
-    return result;
-  }
+export function positionDown(position: Position): Position {
+  return { row: position.row + 1, col: position.col };
+}
+export function positionLeft(position: Position): Position {
+  return { row: position.row, col: position.col - 1 };
+}
+export function positionRight(position: Position): Position {
+  return { row: position.row, col: position.col + 1 };
+}
+export function positionCantor(position: Position): number {
+  return (
+    ((position.row + position.col) * (position.row + position.col + 1)) / 2 +
+    position.col
+  );
+}
+export function positionFromCantor(cantor: number): Position {
+  const w = Math.floor((Math.sqrt(8 * cantor + 1) - 1) / 2);
+  const t = (w * (w + 1)) / 2;
+  const y = cantor - t;
+  const x = w - y;
+  return { row: x, col: y };
 }
 
 export class Grid<T> {
@@ -60,7 +66,7 @@ export class Grid<T> {
 
     for (const [rowNumber, line] of lines.entries()) {
       for (let colNumber = 0; colNumber < line.length; ++colNumber) {
-        const position: Position = new Position(rowNumber, colNumber);
+        const position: Position = { row: rowNumber, col: colNumber };
         grid.set(position, cellBuilder(line[colNumber] as string));
       }
     }
@@ -69,25 +75,32 @@ export class Grid<T> {
   }
 
   set(position: Position, value: T) {
-    this.rows = Math.max(this.rows, position.getRow() + 1);
-    this.cols = Math.max(this.cols, position.getCol() + 1);
+    this.rows = Math.max(this.rows, position.row + 1);
+    this.cols = Math.max(this.cols, position.col + 1);
 
-    const row =
-      this.cells.get(position.getRow()) ?? new Map<ColNumber, Cell<T>>();
-    row.set(position.getCol(), { kind: "occupied", value, position });
-    this.cells.set(position.getRow(), row);
+    const row = this.cells.get(position.row) ?? new Map<ColNumber, Cell<T>>();
+    row.set(position.col, { kind: "occupied", value, position });
+    this.cells.set(position.row, row);
+  }
+
+  rowCount(): number {
+    return this.rows;
+  }
+
+  colCount(): number {
+    return this.cols;
   }
 
   at(position: Position): Cell<T> {
-    const row = this.cells.get(position.getRow());
-    const cell = row?.get(position.getCol());
+    const row = this.cells.get(position.row);
+    const cell = row?.get(position.col);
     return cell ?? { kind: "vacant", position: position };
   }
 
   getNeighbours(position: Position): Cell<T>[] {
     const result: Cell<T>[] = [];
 
-    for (const neighbourPosition of position.getNeighbours()) {
+    for (const neighbourPosition of positionNeighbours(position)) {
       result.push(this.at(neighbourPosition));
     }
 
@@ -104,11 +117,11 @@ export class Grid<T> {
     return {
       next(): IteratorResult<Position> {
         if (currentCol < cols) {
-          return { value: new Position(currentRow, currentCol++), done: false };
+          return { value: { row: currentRow, col: currentCol++ }, done: false };
         } else if (currentRow < rows - 1) {
           currentCol = 0;
           return {
-            value: new Position(++currentRow, currentCol++),
+            value: { row: ++currentRow, col: currentCol++ },
             done: false,
           };
         } else {

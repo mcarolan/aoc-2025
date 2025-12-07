@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "tiny-lru": "^11.4.5",
     "typescript": "^5.9.3"
   },
   "devDependencies": {

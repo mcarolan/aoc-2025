@@ -1,4 +1,4 @@
-import { Character, Grid, Position } from "../src/grid";
+import { Character, Grid } from "../src/grid";
 
 describe("grid", () => {
   test("position iterator", () => {
@@ -13,15 +13,15 @@ describe("grid", () => {
     expect(positions.length).toBe(9);
     expect(positions.toString()).toBe(
       [
-        new Position(0, 0),
-        new Position(0, 1),
-        new Position(0, 2),
-        new Position(1, 0),
-        new Position(1, 1),
-        new Position(1, 2),
-        new Position(2, 0),
-        new Position(2, 1),
-        new Position(2, 2),
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+        { row: 1, col: 0 },
+        { row: 1, col: 1 },
+        { row: 2, col: 0 },
+        { row: 2, col: 1 },
+        { row: 2, col: 2 },
+        { row: 1, col: 2 },
       ].toString(),
     );
   });

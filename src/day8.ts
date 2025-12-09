@@ -100,9 +100,9 @@ export function part1(input: string, n: number): number {
       const toKeep = Math.min(fromNeighbourhood, toNeighbourhood);
       const toDiscard = Math.max(fromNeighbourhood, toNeighbourhood);
 
+      const toKeepSet = nodesByNeighbourhoods.get(toKeep);
       for (const discard of nodesByNeighbourhoods.get(toDiscard)!) {
         neighbourhoodsByNode.set(discard, toKeep);
-        const toKeepSet = nodesByNeighbourhoods.get(toKeep);
         toKeepSet?.add(discard);
       }
       nodesByNeighbourhoods.delete(toDiscard);
@@ -117,7 +117,7 @@ export function part1(input: string, n: number): number {
     sizes.push(neighbourhood.size);
   }
 
-  sizes.sort((n1, n2) => n1 - n2);
+  sizes.sort();
 
   return (
     sizes[sizes.length - 1]! *

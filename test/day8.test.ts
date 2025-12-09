@@ -30,7 +30,7 @@ describe("day 8", () => {
 
     test("input", () => {
       const input = readInput("day8");
-      expect(part1(input, 1000)).toBe(0);
+      expect(part1(input, 1000)).toBe(122636);
     });
   });
 });

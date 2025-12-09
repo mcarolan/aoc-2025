@@ -1,5 +1,13 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { splitLines } from "./utils";
-import { RecordFactory, Record, RecordOf, is, List, Set, Map } from "immutable";
+import {
+  RecordFactory,
+  Record,
+  RecordOf,
+  is,
+  List,
+  Set as ImmSet,
+} from "immutable";
 
 type CoordProps = { x: number; y: number; z: number };
 const defaultCoord: CoordProps = { x: 0, y: 0, z: 0 };
@@ -11,7 +19,7 @@ function coordToString(coord: Coord): string {
 }
 
 function coordFromArray(coord: number[]): Coord {
-  return makeCoord({ x: coord[0]!, y: coord[1]!, z: coord[2]! }); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  return makeCoord({ x: coord[0]!, y: coord[1]!, z: coord[2]! });
 }
 
 function straightLineDistance(p: Coord, q: Coord): number {
@@ -26,7 +34,7 @@ export function part1(input: string, n: number): number {
   );
 
   type Distance = { from: Coord; to: Coord; value: number };
-  let calculatedDistances: Set<List<Coord>> = Set();
+  let calculatedDistances: ImmSet<List<Coord>> = ImmSet();
   let distances: List<Distance> = List();
 
   for (const coord1 of coordinates) {
@@ -36,8 +44,8 @@ export function part1(input: string, n: number): number {
       }
 
       const fromTo = List([coord1, coord2]).sort();
-      const from = fromTo.get(0)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-      const to = fromTo.get(1)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      const from = fromTo.get(0)!;
+      const to = fromTo.get(1)!;
 
       if (!calculatedDistances.has(fromTo)) {
         calculatedDistances = calculatedDistances.add(fromTo);
@@ -52,13 +60,13 @@ export function part1(input: string, n: number): number {
 
   distances = distances.sortBy((d) => d.value);
 
-  let neighbourhoodsByNode = Map<string, number>();
-  let nodesByNeighbourhoods = Map<number, Set<string>>();
+  const neighbourhoodsByNode = new Map<string, number>();
+  const nodesByNeighbourhoods = new Map<number, Set<string>>();
 
   let counter = 0;
 
   for (let i = 0; i < n; ++i) {
-    const entry = distances.get(i)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    const entry = distances.get(i)!;
 
     const from = coordToString(entry.from);
     const to = coordToString(entry.to);
@@ -67,57 +75,53 @@ export function part1(input: string, n: number): number {
 
     if (fromNeighbourhood === undefined && toNeighbourhood === undefined) {
       const newNeighbourhood = counter++;
-      neighbourhoodsByNode = neighbourhoodsByNode.set(from, newNeighbourhood);
-      neighbourhoodsByNode = neighbourhoodsByNode.set(to, newNeighbourhood);
-      nodesByNeighbourhoods = nodesByNeighbourhoods.set(
-        newNeighbourhood,
-        Set([from, to]),
-      );
+      neighbourhoodsByNode.set(from, newNeighbourhood);
+      neighbourhoodsByNode.set(to, newNeighbourhood);
+      nodesByNeighbourhoods.set(newNeighbourhood, new Set([from, to]));
     } else if (
       fromNeighbourhood === undefined &&
       toNeighbourhood !== undefined
     ) {
-      neighbourhoodsByNode = neighbourhoodsByNode.set(from, toNeighbourhood);
-      nodesByNeighbourhoods = nodesByNeighbourhoods.set(
-        toNeighbourhood,
-        nodesByNeighbourhoods.get(toNeighbourhood, Set<string>()).add(from),
-      );
+      neighbourhoodsByNode.set(from, toNeighbourhood);
+      const toNeighbourSet = nodesByNeighbourhoods.get(toNeighbourhood);
+      toNeighbourSet?.add(from);
     } else if (
       fromNeighbourhood !== undefined &&
       toNeighbourhood === undefined
     ) {
-      neighbourhoodsByNode = neighbourhoodsByNode.set(to, fromNeighbourhood);
-      nodesByNeighbourhoods = nodesByNeighbourhoods.set(
-        fromNeighbourhood,
-        nodesByNeighbourhoods.get(fromNeighbourhood, Set<string>()).add(to),
-      );
+      neighbourhoodsByNode.set(to, fromNeighbourhood);
+      const fromNeighbourSet = nodesByNeighbourhoods.get(fromNeighbourhood);
+      fromNeighbourSet?.add(to);
     } else if (
       fromNeighbourhood !== undefined &&
       toNeighbourhood !== undefined &&
       fromNeighbourhood !== toNeighbourhood
     ) {
-      //join neighbourhoods
       const toKeep = Math.min(fromNeighbourhood, toNeighbourhood);
       const toDiscard = Math.max(fromNeighbourhood, toNeighbourhood);
 
-      for (const discard of nodesByNeighbourhoods.get(
-        toDiscard,
-        Set<string>(),
-      )) {
-        neighbourhoodsByNode = neighbourhoodsByNode.set(discard, toKeep);
-        nodesByNeighbourhoods = nodesByNeighbourhoods.set(
-          toKeep,
-          nodesByNeighbourhoods.get(toKeep, Set<string>()).add(discard),
-        );
+      for (const discard of nodesByNeighbourhoods.get(toDiscard)!) {
+        neighbourhoodsByNode.set(discard, toKeep);
+        const toKeepSet = nodesByNeighbourhoods.get(toKeep);
+        toKeepSet?.add(discard);
       }
-      nodesByNeighbourhoods = nodesByNeighbourhoods.remove(toDiscard);
+      nodesByNeighbourhoods.delete(toDiscard);
 
-      neighbourhoodsByNode = neighbourhoodsByNode.set(from, toKeep);
-      neighbourhoodsByNode = neighbourhoodsByNode.set(to, toKeep);
+      neighbourhoodsByNode.set(from, toKeep);
+      neighbourhoodsByNode.set(to, toKeep);
     }
   }
 
-  const biggest = nodesByNeighbourhoods.toList().sortBy((value) => -value.size);
+  const sizes: number[] = [];
+  for (const neighbourhood of nodesByNeighbourhoods.values()) {
+    sizes.push(neighbourhood.size);
+  }
 
-  return biggest.get(0)!.size * biggest.get(1)!.size * biggest.get(2)!.size; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  sizes.sort((n1, n2) => n1 - n2);
+
+  return (
+    sizes[sizes.length - 1]! *
+    sizes[sizes.length - 2]! *
+    sizes[sizes.length - 3]!
+  );
 }

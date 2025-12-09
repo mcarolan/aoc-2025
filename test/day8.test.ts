@@ -1,5 +1,5 @@
 import { part1 } from "../src/day8";
-// import { readInput } from "./utils";
+import { readInput } from "./utils";
 
 describe("day 8", () => {
   describe("part 1", () => {
@@ -28,9 +28,9 @@ describe("day 8", () => {
       expect(part1(input, 10)).toBe(40);
     });
 
-    // test("input", () => {
-    //   const input = readInput("day8");
-    //   expect(part1(input, 1000)).toBe(0);
-    // });
+    test("input", () => {
+      const input = readInput("day8");
+      expect(part1(input, 1000)).toBe(0);
+    });
   });
 });
